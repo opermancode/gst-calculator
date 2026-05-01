@@ -3,9 +3,19 @@ import axios from 'axios';
 const USER_SERVICE = "http://localhost:8081";
 const GST_SERVICE = "http://localhost:8080";
 
-export const signup = (data) => axios.post(`${USER_SERVICE}/signup`, data);
-export const login = (data) => axios.post(`${USER_SERVICE}/login`, data);
-export const calculateGST = (data, token) =>
-  axios.post(`${GST_SERVICE}/calculate`, data, {
+// Signup
+export const signup = (data) => {
+  return axios.post(`${USER_SERVICE}/signup`, data);
+};
+
+// Login
+export const login = (data) => {
+  return axios.post(`${USER_SERVICE}/login`, data);
+};
+
+// GST Calculation
+export const calculateGST = (data, token) => {
+  return axios.post(`${GST_SERVICE}/calculate`, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
+};
