@@ -1,22 +1,15 @@
-import React, { useState } from 'react';
-import Login from './components/Login';
-import Signup from './components/Signup';
-import Calculator from './components/Calculator';
+import React from 'react';
+import Signup from './Signup';
+import Login from './Login';
+import Calculator from './Calculator';
 
 function App() {
-  const [token, setToken] = useState(null);
-
   return (
-    <div>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
       <h1>GST Calculator App</h1>
-      {!token ? (
-        <>
-          <Signup />
-          <Login setToken={setToken} />
-        </>
-      ) : (
-        <Calculator token={token} />
-      )}
+      <Signup />
+      <Login />
+      <Calculator />
     </div>
   );
 }
