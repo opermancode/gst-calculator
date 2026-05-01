@@ -6,7 +6,7 @@ const pool = new Pool({
   password: process.env.DB_PASS,
   database: 'usersdb',
   port: 5432,
-  ssl: { rejectUnauthorized: false } // RDS requires SSL
+  ssl: { rejectUnauthorized: false } // required for RDS
 });
 
 module.exports = pool;
