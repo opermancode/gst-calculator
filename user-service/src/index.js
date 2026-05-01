@@ -6,7 +6,6 @@ const pool = require('./db');
 const app = express();
 app.use(express.json());
 
-// Signup
 app.post('/signup', async (req, res) => {
   const { username, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
@@ -14,7 +13,6 @@ app.post('/signup', async (req, res) => {
   res.json({ message: 'User created successfully' });
 });
 
-// Login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
