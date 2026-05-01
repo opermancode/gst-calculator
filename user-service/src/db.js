@@ -1,10 +1,12 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
-const pool = mysql.createPool({
+const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: 'usersdb'
+  database: 'usersdb',
+  port: 5432,
+  ssl: { rejectUnauthorized: false } // RDS requires SSL
 });
 
 module.exports = pool;
