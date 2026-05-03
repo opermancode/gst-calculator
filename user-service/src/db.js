@@ -1,4 +1,8 @@
-const { Pool } = require('pg');
+import pkg from 'pg';
+const { Pool } = pkg;
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -6,7 +10,9 @@ const pool = new Pool({
   password: process.env.DB_PASS,
   database: 'usersdb',
   port: 5432,
-  ssl: { rejectUnauthorized: false } // required for RDS
+  ssl: { 
+    rejectUnauthorized: false   // Required for AWS RDS
+  }
 });
 
-module.exports = pool;
+export default pool;
