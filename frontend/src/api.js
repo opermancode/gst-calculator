@@ -8,7 +8,7 @@ import axios from 'axios';
 */
 
 // 👉 For local testing (optional)
-const DEFAULT_BASE_URL = "http://13.218.219.188";
+const DEFAULT_BASE_URL = "http://abfb262ef458c4cbea464794b35e7481-1ef6762383747a0b.elb.amazonaws.com";
 
 // 👉 Production (EKS)
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || DEFAULT_BASE_URL;
