@@ -1,21 +1,30 @@
-import axios from 'axios';
+import axios from "axios";
 
 /*
-  ✅ FINAL STRATEGY
+  ✅ FINAL CLEAN ARCHITECTURE
 
-  - Frontend talks to ONE API base URL
-  - Backend routing handled via Ingress / LoadBalancer
+  Frontend → Ingress LoadBalancer → Kubernetes Services
+
+  NEVER use EC2 IP directly in production
 */
 
-// 👉 For local testing (optional)
-const DEFAULT_BASE_URL = "http://abfb262ef458c4cbea464794b35e7481-1ef6762383747a0b.elb.amazonaws.com";
+// ==========================
+// 🌍 BASE URL (EKS INGRESS)
+// ==========================
 
-// 👉 Production (EKS)
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || DEFAULT_BASE_URL;
+const DEFAULT_BASE_URL =
+  "http://abfb262ef458c4cbea464794b35e7481-1ef6762383747a0b.elb.amazonaws.com";
 
-console.log("API BASE URL:", BASE_URL);
+// Use env variable if available (best practice for prod/dev split)
+const BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || DEFAULT_BASE_URL;
 
-// Create axios instance
+console.log("🚀 API BASE URL:", BASE_URL);
+
+// ==========================
+// AXIOS INSTANCE
+// ==========================
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -48,3 +57,9 @@ export const calculateGST = async (data, token) => {
     },
   });
 };
+
+// ==========================
+// OPTIONAL: EXPORT API INSTANCE
+// ==========================
+
+export default api;
