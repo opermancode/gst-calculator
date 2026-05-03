@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { calculateGST } from '../api';
+import { calculateGST } from './api';
 
 export default function Calculator({ token }) {
   const [amount, setAmount] = useState('');
