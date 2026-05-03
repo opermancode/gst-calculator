@@ -1,26 +1,27 @@
 import axios from 'axios';
 
 /*
-  ✅ CONFIG STRATEGY
+  ✅ FINAL STRATEGY
 
-  1. In Kubernetes:
-     Use REACT_APP_API_BASE_URL (set via env)
-
-  2. In local/dev:
-     fallback to EC2 IP (or localhost)
+  - Frontend talks to ONE API base URL
+  - Backend routing handled via Ingress / LoadBalancer
 */
 
-// 👉 Change this ONLY for local testing if needed
+// 👉 For local testing (optional)
 const DEFAULT_BASE_URL = "http://13.218.219.188";
 
-// 👉 Kubernetes / Production (will override above)
+// 👉 Production (EKS)
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || DEFAULT_BASE_URL;
 
-// Services
-const USER_SERVICE = `${BASE_URL}:8081`;
-const GST_SERVICE = `${BASE_URL}:8080`;
-
 console.log("API BASE URL:", BASE_URL);
+
+// Create axios instance
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // ==========================
 // 🔐 AUTH APIs
@@ -28,12 +29,12 @@ console.log("API BASE URL:", BASE_URL);
 
 // Signup
 export const signup = async (data) => {
-  return axios.post(`${USER_SERVICE}/signup`, data);
+  return api.post("/signup", data);
 };
 
 // Login
 export const login = async (data) => {
-  return axios.post(`${USER_SERVICE}/login`, data);
+  return api.post("/login", data);
 };
 
 // ==========================
@@ -41,7 +42,7 @@ export const login = async (data) => {
 // ==========================
 
 export const calculateGST = async (data, token) => {
-  return axios.post(`${GST_SERVICE}/calculate`, data, {
+  return api.post("/calculate", data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
