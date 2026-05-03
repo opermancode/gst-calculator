@@ -1,14 +1,11 @@
 import axios from 'axios';
 
-// For local testing on EC2 (same machine)
-const USER_SERVICE = "http://localhost:8081";
-const GST_SERVICE = "http://localhost:8080";
+const EC2_IP = "http://13.218.219.188";   // ← Change to your actual EC2 Public IP
 
-// For Kubernetes (when deployed with Helm) - use service names
-// const USER_SERVICE = "http://user-service:8081";
-// const GST_SERVICE = "http://gst-calculator:8080";
+const USER_SERVICE = `${EC2_IP}:8081`;
+const GST_SERVICE = `${EC2_IP}:8080`;
 
-console.log("API Base URL:", USER_SERVICE);
+console.log("Using API:", USER_SERVICE); // for debugging
 
 // Signup
 export const signup = (data) => {
