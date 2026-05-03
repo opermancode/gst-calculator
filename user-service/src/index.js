@@ -3,39 +3,79 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from './db.js';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
-dotenv.config();   // This will load .env from the root folder
+dotenv.config();
 
 const app = express();
-const PORT = 8081;   // ← Hardcoded as requested
+const PORT = process.env.PORT || 8081;
 
+// ✅ CORS Configuration
+app.use(cors({
+  origin: "*", // 🔥 For now (later restrict to frontend URL)
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// ✅ Middleware
 app.use(express.json());
 
-// Signup Endpoint
+// ✅ Health Check (very useful for K8s later)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
+
+
+// ==========================
+// 🔐 Signup Endpoint
+// ==========================
 app.post('/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    // ✅ Basic validation
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required" });
+    }
+
+    // ✅ Hash password
     const hashed = await bcrypt.hash(password, 10);
-    
+
+    // ✅ Insert user
     await pool.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2)', 
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
       [username, hashed]
     );
-    
-    res.json({ message: 'User created successfully' });
+
+    res.status(201).json({ message: 'User created successfully' });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+
+    // ✅ Duplicate user handling (Postgres error code)
+    if (err.code === '23505') {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    console.error("❌ Signup Error:", err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Login Endpoint
+
+// ==========================
+// 🔐 Login Endpoint
+// ==========================
 app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
+    // ✅ Validation
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required" });
+    }
+
     const result = await pool.query(
-      'SELECT * FROM users WHERE username = $1', 
+      'SELECT * FROM users WHERE username = $1',
       [username]
     );
 
@@ -43,25 +83,33 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found' });
     }
 
-    const match = await bcrypt.compare(password, result.rows[0].password);
-    
+    const user = result.rows[0];
+
+    const match = await bcrypt.compare(password, user.password);
+
     if (!match) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // ✅ JWT Token
     const token = jwt.sign(
-      { username }, 
-      process.env.JWT_SECRET || 'secretkey', 
+      { username: user.username },
+      process.env.JWT_SECRET || 'secretkey',
       { expiresIn: '1h' }
     );
 
     res.json({ token });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("❌ Login Error:", err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ User Service running on http://localhost:${PORT}`);
+
+// ==========================
+// 🚀 Start Server
+// ==========================
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 User Service running on port ${PORT}`);
 });
